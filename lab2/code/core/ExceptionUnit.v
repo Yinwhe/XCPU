@@ -51,10 +51,13 @@ module ExceptionUnit(
     wire rwaddr_valid = csr_rwaddr[11:7] == 5'h6 && csr_rwaddr[5:3] == 3'h0;
     wire[3:0] rwaddr_map = (csr_rwaddr[6] << 3) + csr_rwaddr[2:0];
 
-    wire ABN = exp != 6'b000000;    // Abnormal Type
+    wire MIE = mstatus[3];
+    
     wire MRET = exp[5];
-    wire INT  = exp[0];
-    wire[3:0] EXP = exp[4:1];
+    wire INT  = exp[0] & MIE;
+    wire[3:0] EXP = exp[4:1] & {4{MIE}};
+    wire ABN = MRET | INT | |EXP;    // Abnormal Type
+    
 
     assign csr_r_data_out = CSR[rwaddr_map];
     assign PC_redirect = PCR;
@@ -142,17 +145,17 @@ module ExceptionUnit(
             end
             else if (INT) begin
                 CSR[0][7] <= CSR[0][3]; CSR[0][3] <= 1'b0; CSR[0][12:11] <= CM; CM <= 2'b11;  // mstatus
-                CSR[9]  <= epc_next;    // mepc
-                CSR[10] <= 32'h100B;    // mcause
+                CSR[9]    <= epc_next;    // mepc
+                CSR[10]   <= 32'h8000000B;    // mcause
             end
             else if (EXP) begin
-                CSR[0][3] <= 1'b0; CSR[0][7] <= 1'b1; CSR[0][12:11] <= CM;  // mstatus
+                CSR[0][7] <= CSR[0][3]; CSR[0][3] <= 1'b0; CSR[0][12:11] <= CM; CM <= 2'b11;  // mstatus
                 CSR[9]  <= epc_cur;     // mepc
                 case(EXP) // ecall_m, s_access_fault, l_access_fault, illegal_inst
-                    4'b0001: CSR[10] <= 32'h0002;
-                    4'b0010: CSR[10] <= 32'h0005;
-                    4'b0100: CSR[10] <= 32'h0007;
-                    4'b1000: CSR[10] <= 32'h000B;
+                    4'b0001: CSR[10] <= 32'h00000002;
+                    4'b0010: CSR[10] <= 32'h00000005;
+                    4'b0100: CSR[10] <= 32'h00000007;
+                    4'b1000: CSR[10] <= 32'h0000000B;
                 endcase
             end
         end
