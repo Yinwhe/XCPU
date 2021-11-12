@@ -100,7 +100,8 @@ module top (
         .rst(rst_all),
         .interrupter(SW[12])
         );
-
+    
+        
     VGA_TESTP  vga(.clk(clk100MHz),
                     .clk25(clk_disp),
                     .Debug_addr(debug_addr),

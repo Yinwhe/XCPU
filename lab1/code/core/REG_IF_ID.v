@@ -35,7 +35,7 @@ module    REG_IF_ID(input clk,                                      //IF/ID Latc
     always @(posedge clk or posedge rst) begin
         if(rst) begin
              IR_ID <= 32'h00000000;                            //复位清零
-             PCurrent_ID <= 32'h00000000;                      //复位清零
+             PCurrent_ID <= 32'h00000000;                     //复位清零
             end
         else if(EN)begin
                 if(Data_stall)begin
@@ -47,11 +47,11 @@ module    REG_IF_ID(input clk,                                      //IF/ID Latc
                 else begin
                         IR_ID <= IR;                       //正常取指,传送下一流水级译码
                         PCurrent_ID <= PCOUT;  end         //当前取指PC地址，Branch/Junp指令计算目标地址用(非PC+4)
-        end
-        else begin
-            IR_ID <= IR_ID;
-            PCurrent_ID <= PCurrent_ID;
-        end
+            end
+            else begin
+                IR_ID <= IR_ID;
+                PCurrent_ID <= PCurrent_ID;
+            end
     end
 
 endmodule

@@ -28,7 +28,7 @@ module   REG_EX_MEM(input clk,                                      //EX/MEM Lat
                     input [31:0] ALUO_EX,                           //当前ALU执行输出：有效地�?或ALU操作
                     input [31:0] B_EX,                              //ID级读出寄存器B数据：CPU输出数据
                     input [4:0]  rd_EX,                             //传�?�当前指令写目的寄存器地�?
-                    input DatatoReg_EX,                             //传�?�当前指令REG写数据�?�道选择
+                    input DatatoReg_EX,                      //传�?�当前指令REG写数据�?�道选择
                     input RegWrite_EX,                              //传�?�当前指令寄存器写信�?
                     input WR_EX,                                    //传�?�当前指令存储器读写信号
                     input[2:0] u_b_h_w_EX,

@@ -45,7 +45,7 @@ module  RV32core(
     wire[31:0] ALUout_MEM, PC_MEM, inst_MEM, Dataout_MEM, Datain_MEM;
 
 
-    wire reg_MW_EN, RegWrite_WB, DatatoReg_WB, mem_w_WB, MIO_WB;
+    wire reg_MW_EN, RegWrite_WB, DatatoReg_WB;
     wire[4:0] rd_WB;
     wire [31:0] wt_data_WB, PC_WB, inst_WB, ALUout_WB, Datain_WB;
 
@@ -66,9 +66,7 @@ module  RV32core(
 
         .IR_ID(inst_ID),.PCurrent_ID(PC_ID));
     
-    CtrlUnit ctrl(.inst(inst_ID),.cmp_res(cmp_res_ID),
-    
-        .Branch(Branch_ctrl),.ALUSrc_A(ALUSrc_A_ctrl),
+    CtrlUnit ctrl(.inst(inst_ID),.cmp_res(cmp_res_ID),.Branch(Branch_ctrl),.ALUSrc_A(ALUSrc_A_ctrl),
         .ALUSrc_B(ALUSrc_B_ctrl),.DatatoReg(DatatoReg_ctrl),.RegWrite(RegWrite_ctrl),
         .mem_w(mem_w_ctrl),.MIO(MIO_ctrl),.rs1use(rs1use_ctrl),.rs2use(rs2use_ctrl),
         .hazard_optype(hazard_optype_ctrl),.ImmSel(ImmSel_ctrl),.cmp_ctrl(cmp_ctrl),
@@ -81,10 +79,10 @@ module  RV32core(
     
     ImmGen imm_gen(.ImmSel(ImmSel_ctrl),.inst_field(inst_ID),.Imm_out(Imm_out_ID));
     
-    MUX4T1_32 mux_forward_A(.I0(rs1_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_WB),        //to fill sth. in ()
+    MUX4T1_32 mux_forward_A(.I0(rs1_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_MEM),        //to fill sth. in ()
         .s(forward_ctrl_A),.o(rs1_data_ID));
     
-    MUX4T1_32 mux_forward_B(.I0(rs2_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_WB),        //to fill sth. in ()
+    MUX4T1_32 mux_forward_B(.I0(rs2_data_reg),.I1(ALUout_EXE),.I2(ALUout_MEM),.I3(Datain_MEM),        //to fill sth. in ()
         .s(forward_ctrl_B),.o(rs2_data_ID));
     
     MUX2T1_32 mux_branch_ID(.I0(PC_ID),.I1(rs1_data_ID),.s(JALR),.o(addA_ID));
@@ -94,16 +92,11 @@ module  RV32core(
     cmp_32 cmp_ID(.a(rs1_data_ID),.b(rs2_data_ID),.ctrl(cmp_ctrl),.c(cmp_res_ID));        
     
     HazardDetectionUnit hazard_unit(.clk(debug_clk),.Branch_ID(Branch_ctrl),.rs1use_ID(rs1use_ctrl),
-        .rs2use_ID(rs2use_ctrl),.hazard_optype_ID(hazard_optype_ctrl),
-        .rd_EXE(rd_EXE),.rd_MEM(rd_MEM),.rd_WB(rd_WB),
-        .rs1_ID(inst_ID[19:15]),.rs2_ID(inst_ID[24:20]),
-        .RegW_EXE(RegWrite_EXE),.RegW_MEM(RegWrite_MEM),
-        .MIO_EXE(MIO_EXE), .MIO_MEM(MIO_MEM), .MIO_WB(MIO_WB),
-        .mem_w_EXE(mem_w_EXE), .mem_w_MEM(mem_w_MEM), .mem_w_WB(mem_w_WB),
-
+        .rs2use_ID(rs2use_ctrl),.hazard_optype_ID(hazard_optype_ctrl),.rd_EXE(rd_EXE),
+        .rd_MEM(rd_MEM),.rs1_ID(inst_ID[19:15]),.rs2_ID(inst_ID[24:20]),.rs2_EXE(rs2_EXE),
         .PC_EN_IF(PC_EN_IF),.reg_FD_EN(reg_FD_EN),.reg_FD_stall(reg_FD_stall),
         .reg_FD_flush(reg_FD_flush),.reg_DE_EN(reg_DE_EN),.reg_DE_flush(reg_DE_flush),
-        .reg_EM_EN(reg_EM_EN),.reg_EM_flush(reg_EM_flush),.reg_MW_EN(reg_MW_EN),
+       .reg_EM_EN(reg_EM_EN),.reg_EM_flush(reg_EM_flush),.reg_MW_EN(reg_MW_EN),
         .forward_ctrl_ls(forward_ctrl_ls),.forward_ctrl_A(forward_ctrl_A),
         .forward_ctrl_B(forward_ctrl_B));
 
@@ -121,7 +114,7 @@ module  RV32core(
         .DatatoReg_EX(DatatoReg_EXE),.RegWrite_EX(RegWrite_EXE),.WR_EX(mem_w_EXE),
         .u_b_h_w_EX(u_b_h_w_EXE),.MIO_EX(MIO_EXE));
     
-    MUX2T1_32 mux_A_EXE(.I0(PC_EXE),.I1(rs1_data_EXE),.s(ALUSrc_A_EXE),.o(ALUA_EXE));     //to fill sth. in ()
+    MUX2T1_32 mux_A_EXE(.I0(rs1_data_EXE),.I1(PC_EXE),.s(ALUSrc_A_EXE),.o(ALUA_EXE));     //to fill sth. in ()
 
     MUX2T1_32 mux_B_EXE(.I0(rs2_data_EXE),.I1(Imm_EXE),.s(ALUSrc_B_EXE),.o(ALUB_EXE));    //to fill sth. in ()
 
@@ -149,11 +142,9 @@ module  RV32core(
     REG_MEM_WB reg_MEM_WB(.clk(debug_clk),.rst(rst),.EN(reg_MW_EN),.IR_MEM(inst_MEM),
         .PCurrent_MEM(PC_MEM),.ALUO_MEM(ALUout_MEM),.Datai(Datain_MEM),.rd_MEM(rd_MEM),
         .DatatoReg_MEM(DatatoReg_MEM),.RegWrite_MEM(RegWrite_MEM),
-        .MIO_MEM(MIO_MEM), .WR_MEM(mem_w_MEM),
 
         .PCurrent_WB(PC_WB),.IR_WB(inst_WB),.ALUO_WB(ALUout_WB),.MDR_WB(Datain_WB),
-        .rd_WB(rd_WB),.DatatoReg_WB(DatatoReg_WB),.RegWrite_WB(RegWrite_WB),
-        .MIO_WB(MIO_WB), .WR_WB(mem_w_WB));
+        .rd_WB(rd_WB),.DatatoReg_WB(DatatoReg_WB),.RegWrite_WB(RegWrite_WB));
     
     MUX2T1_32 mux_WB(.I0(ALUout_WB),.I1(Datain_WB),.s(DatatoReg_WB),.o(wt_data_WB));
 

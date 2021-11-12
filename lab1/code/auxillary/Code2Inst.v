@@ -3,6 +3,7 @@ module Code2Inst (
     input[31:0] code,
     output reg [19*8-1:0] inst
 );
+/*
     wire[3*8-1:0] INST_rd ={"x", num2str({3'b000,code[11]}), num2str(code[10:7])};            
     wire[3*8-1:0] INST_rs1 ={"x", num2str({3'b000,code[19]}), num2str(code[18:15])};            
     wire[3*8-1:0] INST_rs2 ={"x", num2str({3'b000,code[24]}), num2str(code[23:20])};  
@@ -13,12 +14,12 @@ module Code2Inst (
     wire[6*8-1:0] UJim_20 ={num2str(code[31]),num2str(code[19:16]),num2str(code[15:12]),num2str({code[20],code[30:28]}), num2str(code[27:24]), num2str({code[23:21],1'b0})};
     wire[5*8-1:0] Uimm_20 ={num2str(code[31:28]),num2str(code[27:24]),num2str(code[23:20]), num2str(code[19:16]), num2str(code[15:12])};
     
-    wire[13*8-1:0] R_Type  = {" ", INST_rd,",", INST_rs1,",",INST_rs2, " "};        //3*3+2=11     1
-    wire[13*8-1:0] I_Type  = {" ", INST_rd,",", INST_rs1,",", imm_12, "H"};         //3*3+2=11     1
-    wire[13*8-1:0] S_Type  = {" ", INST_rs1,",", INST_rs2,",", Simm_12, "H"};       //3*3+2=11     1
-    wire[13*8-1:0] SB_Type = {" ",INST_rs1,",", INST_rs2,",", SBim_12};             //2*3+4+2=12   0
-    wire[13*8-1:0] UJ_Type = {" ",INST_rd,",", UJim_20, "H "};                      //3+6+1=10     1  
-    wire[13*8-1:0] U_Type  = {" ", INST_rd,",", Uimm_20, "H  "};                    //3+5+1=9      3
+    wire[13*8-1:0] R_Type = {" ", INST_rd,",", INST_rs1,",",INST_rs2, " "};         //3*3+2=11     1
+    wire[13*8-1:0] I_Type = {" ", INST_rd,",", INST_rs1,",", imm_12, "H"};          //3*3+2=11      1
+    wire[13*8-1:0] S_Type = {" ", INST_rs1,",", INST_rs2,",", Simm_12, "H"};        //3*3+2=11     1
+    wire[13*8-1:0] SB_Type = {" ",INST_rs1,",", INST_rs2,",", SBim_12};             //2*3+4+2=12    0
+    wire[13*8-1:0] UJ_Type = {" ",INST_rd,",", UJim_20, "H "};                      //3+6+1=10    1  
+    wire[13*8-1:0] U_Type = {" ", INST_rd,",", Uimm_20, "H  "};                     //3+5+1=9    3
     
     always @* begin 
         if(code==32'h00000000) inst = "nop DStall:lw 00   ";
@@ -46,9 +47,6 @@ module Code2Inst (
                     3'b000: inst = {"beq",SB_Type, "   "};
                     3'b001: inst = {"bne",SB_Type, "   "};
                     3'b100: inst = {"blt",SB_Type, "   "};
-                    3'b101: inst = {"bge",SB_Type, "   "};
-                    3'b110: inst = {"bltu",SB_Type, "   "};
-                    3'b111: inst = {"bgeu",SB_Type, "   "};
                     default: inst = "illegal instruction";          //illegal instruction
                 endcase
             end
@@ -81,4 +79,5 @@ module Code2Inst (
 				num2str = "A" - 10 + number;
 		end
 	endfunction
+*/
 endmodule
