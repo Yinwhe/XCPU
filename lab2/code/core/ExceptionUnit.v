@@ -137,7 +137,7 @@ module ExceptionUnit(
                 2'b10: CSR[rwaddr_map] = CSR[rwaddr_map] | csr_wdata;
                 2'b11: CSR[rwaddr_map] = CSR[rwaddr_map] & ~csr_wdata;
                 default: CSR[rwaddr_map] = csr_wdata;
-            endcase            
+            endcase
         end
         else if(ABN) begin
             if (MRET) begin
