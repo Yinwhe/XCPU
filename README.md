@@ -1,4 +1,4 @@
 # XCPU
-Work for computer architecture.
+> Work for computer architecture.
 
-High Performance Pipeline CPU.
+High performance pipeline CPU, RISCV arch.
